@@ -136,7 +136,7 @@
 <!--        </repository>-->
 
         <repository>
-            <id>fareye-zjson</id>
+            <id>github</id>
             <name>Fareye Zjson</name>
             <url>https://maven.pkg.github.com/far-eye/zjson</url>
         </repository>
