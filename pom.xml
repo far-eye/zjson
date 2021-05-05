@@ -24,42 +24,42 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
-<!--                <configuration>-->
-<!--                    <source>${compileSource}</source>-->
-<!--                    <target>${compileSource}</target>-->
-<!--                    <testSource>${testCompileSource}</testSource>-->
-<!--                    <testTarget>${testCompileSource}</testTarget>-->
-<!--                    <showDeprecation>true</showDeprecation>-->
-<!--                    <showWarnings>true</showWarnings>-->
-<!--                </configuration>-->
+                <configuration>
+                    <source>${compileSource}</source>
+                    <target>${compileSource}</target>
+                    <testSource>${testCompileSource}</testSource>
+                    <testTarget>${testCompileSource}</testTarget>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
             </plugin>
 
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-source-plugin</artifactId>-->
-<!--                <version>2.2.1</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>attach-sources</id>-->
-<!--                        <goals>-->
-<!--                            <goal>jar-no-fork</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                <version>3.2.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>attach-javadocs</id>-->
-<!--                        <goals>-->
-<!--                            <goal>jar</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 <!--            <plugin>-->
 <!--                <groupId>org.sonatype.plugins</groupId>-->
 <!--                <artifactId>nexus-staging-maven-plugin</artifactId>-->
@@ -71,17 +71,17 @@
 <!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
 <!--                </configuration>-->
 <!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-release-plugin</artifactId>-->
-<!--                <version>2.5</version>-->
-<!--                <configuration>-->
-<!--                    <autoVersionSubmodules>true</autoVersionSubmodules>-->
-<!--                    <useReleaseProfile>false</useReleaseProfile>-->
-<!--                    <releaseProfiles>release</releaseProfiles>-->
-<!--                    <goals>deploy</goals>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -125,7 +125,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-<!--    <distributionManagement>-->
+    <distributionManagement>
 <!--        <snapshotRepository>-->
 <!--            <id>ossrh</id>-->
 <!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
@@ -134,5 +134,11 @@
 <!--            <id>ossrh</id>-->
 <!--            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
 <!--        </repository>-->
-<!--    </distributionManagement>-->
+
+        <repository>
+            <id>fareye-zjson</id>
+            <name>Fareye Zjson</name>
+            <url>https://maven.pkg.github.com/far-eye/zjson</url>
+        </repository>
+    </distributionManagement>
 </project>
