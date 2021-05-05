@@ -28,7 +28,7 @@ all classes  |	100% (6/ 6)  |	93.6% (44/ 47) |  96.2% (332/ 345)  |
 Add following to `<dependencies/>` section of your pom.xml -
 
 ```xml
-<groupId>com.flipkart.zjsonpatch</groupId>
+<groupId>com.fareye.zjson</groupId>
 <artifactId>zjsonpatch</artifactId>
 <version>{version}</version>
 ```
