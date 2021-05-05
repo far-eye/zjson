@@ -144,7 +144,7 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
 
     private void addToObject(JsonPointer path, JsonNode node, JsonNode value) {
         String key = path.last().getField();
-        if (node.has(key) && node.get(key).isObject()) {
+        if (node.has(key) && node.get(key).isObject() && value.isObject()) {
             mergeInBase(node.get(key), value);
         }
         else {
