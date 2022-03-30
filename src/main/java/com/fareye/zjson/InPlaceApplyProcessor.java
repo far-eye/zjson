@@ -144,7 +144,10 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
 
     private void addToObject(JsonPointer path, JsonNode node, JsonNode value) {
         String key = path.last().getField();
-        if (node.has(key) && node.get(key).isObject() && value.isObject()) {
+        if("maxIdMap".equals(key) && node.has(key) && node.get(key).isObject() && value.isObject()){
+            mergeInBaseForMaxIdMap(node.get(key), value);
+        }
+        else if (node.has(key) && node.get(key).isObject() && value.isObject()) {
             mergeInBase(node.get(key), value);
         }
         else {
@@ -163,6 +166,27 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
             } else {
                 ObjectNode baseObjectNode = (ObjectNode) base;
                 baseObjectNode.set(fieldName, value.get(fieldName));
+            }
+        }
+    }
+
+    public void mergeInBaseForMaxIdMap (JsonNode base, JsonNode value) {
+        Iterator<String> fieldsIterator = value.fieldNames();
+
+        while (fieldsIterator.hasNext()) {
+            String fieldName = fieldsIterator.next();
+            if (base.has(fieldName) && base.get(fieldName).isObject()) {
+                mergeInBaseForMaxIdMap(base.get(fieldName), value.get(fieldName));
+            } else {
+                ObjectNode baseObjectNode = (ObjectNode) base;
+
+                JsonNode tempValue= value.get(fieldName);
+
+                if(baseObjectNode.get(fieldName)!=null && baseObjectNode.get(fieldName).longValue()>value.get(fieldName).longValue()){
+                    tempValue = baseObjectNode.get(fieldName);
+                }
+
+                baseObjectNode.set(fieldName,tempValue );
             }
         }
     }
