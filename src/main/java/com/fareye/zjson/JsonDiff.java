@@ -463,7 +463,10 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            generateDiffs(currPath, source.get(key), target.get(key));
+            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/")) && target.has(key) && !source.get(key).equals(target.get(key)))
+                diffs.add(Diff.generateDiff(Operation.REPLACE, currPath, source.get(key), target.get(key)));
+            else
+                generateDiffs(currPath, source.get(key), target.get(key));
         }
         Iterator<String> keysFromTarget = target.fieldNames();
         while (keysFromTarget.hasNext()) {
