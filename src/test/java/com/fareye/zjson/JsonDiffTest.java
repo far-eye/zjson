@@ -156,16 +156,4 @@ public class JsonDiffTest {
         assertEquals(JsonPointer.ROOT.toString(), diff.get(0).get("path").textValue());
         assertEquals("V1", diff.get(0).get("value").get("K1").textValue());
     }
-
-    @Test
-    public void testJsonDiffShowsDiffForUserTypeAndTab() throws JsonProcessingException {
-        String source = "{ \"K1\": \"V1\" }";
-        JsonNode sourceNode = objectMapper.reader().readTree(source);
-        JsonNode diff = JsonDiff.asJson(sourceNode, null, EnumSet.of(DiffFlags.ADD_ORIGINAL_VALUE_ON_REPLACE));
-
-        assertEquals(1, diff.size());
-        assertEquals(Operation.REMOVE.rfcName(), diff.get(0).get("op").textValue());
-        assertEquals(JsonPointer.ROOT.toString(), diff.get(0).get("path").textValue());
-        assertEquals("V1", diff.get(0).get("value").get("K1").textValue());
-    }
 }
