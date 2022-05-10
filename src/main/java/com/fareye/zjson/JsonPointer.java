@@ -1,7 +1,10 @@
 package com.fareye.zjson;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -222,6 +225,7 @@ class JsonPointer {
     public JsonNode evaluate(final JsonNode document) throws JsonPointerEvaluationException {
         JsonNode current = document;
 
+
         for (int idx = 0; idx < tokens.length; ++idx) {
             final RefToken token = tokens[idx];
 
@@ -233,8 +237,21 @@ class JsonPointer {
                 current = current.get(token.getIndex());
             }
             else if (current.isObject()) {
+
+                // create path for operation add
+                if (!current.has(token.getField()) && tokens.length==3){
+                    ObjectMapper mapper=new ObjectMapper();
+                    ObjectNode baseObjectNode = (ObjectNode) current;
+                    baseObjectNode.set(token.getField(), mapper.createObjectNode());
+                    current=baseObjectNode;
+                }
+
+                if(current.toString().equals("{}"))
+                    return null;
+
                 if (!current.has(token.getField()))
                     error(idx,"Missing field \"" + token.getField() + "\"", document);
+
                 current = current.get(token.getField());
             }
             else

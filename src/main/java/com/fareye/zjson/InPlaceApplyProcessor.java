@@ -87,6 +87,8 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
         }
 
         JsonNode parentNode = path.getParent().evaluate(target);
+        if(parentNode==null)
+            return;
         JsonPointer.RefToken token = path.last();
         if (parentNode.isObject()) {
             if (!flags.contains(CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE) &&
@@ -133,6 +135,8 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
             target = value;
         else {
             JsonNode parentNode = path.getParent().evaluate(target);
+            if(parentNode==null)
+                return;
             if (!parentNode.isContainerNode())
                 throw new JsonPatchApplicationException("Cannot reference past scalar value", forOp, path.getParent());
             else if (parentNode.isArray())
