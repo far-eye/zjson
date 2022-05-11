@@ -463,7 +463,7 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/")) && target.has(key) && !source.get(key).equals(target.get(key)))
+            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/")) && target.has(key) && !source.get(key).equals(target.get(key)))
                 diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
             else
                 generateDiffs(currPath, source.get(key), target.get(key));
