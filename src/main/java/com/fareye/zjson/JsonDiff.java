@@ -508,7 +508,14 @@ public final class JsonDiff {
             if (!source.has(key)) {
                 //add case
                 JsonPointer currPath = path.append(key);
-                diffs.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key)));
+                //if maxIdKey is not present in source add the diff as add operation with target values
+                if(currPath.toString().startsWith("/maxIdMap/")){
+                    diffsMaxId.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key), target.get(key)));
+                }
+                else {
+                    diffs.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key)));
+                }
+
             }
         }
     }
