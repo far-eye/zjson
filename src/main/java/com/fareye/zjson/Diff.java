@@ -78,4 +78,14 @@ class Diff {
     public JsonNode getSrcValue(){
         return srcValue;
     }
+
+    @Override
+    public String toString() {
+        return "Diff{" +
+                "path=" + path +
+                ", value=" + value +
+                ", toPath=" + toPath +
+                ", srcValue=" + srcValue +
+                '}';
+    }
 }

@@ -107,15 +107,15 @@ public abstract class AbstractTest {
                 StringWriter fullError = new StringWriter();
                 e.printStackTrace(new PrintWriter(fullError));
 
-//                assertThat(
-//                        errorMessage("Operation failed but with wrong exception type", e),
-//                        e,
-//                        instanceOf(type));
+                assertThat(
+                        errorMessage("Operation failed but with wrong exception type", e),
+                        e,
+                        instanceOf(type));
                 if (message != null) {
-//                    assertThat(
-//                            errorMessage("Operation failed but with wrong message", e),
-//                            e.toString(),
-//                            containsString(message.textValue()));    // equalTo would be better, but fail existing tests
+                    assertThat(
+                            errorMessage("Operation failed but with wrong message", e),
+                            e.toString(),
+                            containsString(message.textValue()));    // equalTo would be better, but fail existing tests
                 }
             }
         }
