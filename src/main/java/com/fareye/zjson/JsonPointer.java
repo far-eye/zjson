@@ -280,6 +280,9 @@ class JsonPointer {
         for (int idx = 0; idx < tokens.length; ++idx) {
             final RefToken token = tokens[idx];
 
+            if(current==null)
+                return null;
+
             if (current.isArray()) {
                 if (!token.isArrayIndex())
                     error(idx, "Can't reference field \"" + token.getField() + "\" on array", document);
@@ -296,6 +299,7 @@ class JsonPointer {
                     baseObjectNode.set(token.getField(), mapper.createObjectNode());
                     current=baseObjectNode;
                 }
+                // handle maxIdMap
                 else if(!current.has(token.getField()) && tokens.length==1 && token.getField().equals("maxIdMap")){
                     ObjectMapper mapper=new ObjectMapper();
                     ObjectNode baseObjectNode = (ObjectNode) current;
@@ -303,11 +307,9 @@ class JsonPointer {
                     current=baseObjectNode;
                 }
 
-                if(current.toString().equals("{}"))
-                    return null;
-
-                if (!current.has(token.getField()))
-                    error(idx,"Missing field \"" + token.getField() + "\"", document);
+                // won't throw error, just skip that patch
+//                if (!current.has(token.getField()))
+//                    error(idx,"Missing field \"" + token.getField() + "\"", document);
 
                 current = current.get(token.getField());
             }
