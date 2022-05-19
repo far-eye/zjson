@@ -93,8 +93,9 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
         if (parentNode.isObject()) {
             if (!flags.contains(CompatibilityFlags.ALLOW_MISSING_TARGET_OBJECT_ON_REPLACE) &&
                     !parentNode.has(token.getField()))
-                throw new JsonPatchApplicationException(
-                        "Missing field \"" + token.getField() + "\"", Operation.REPLACE, path.getParent());
+                     return; // just skip the patch, instead of throwing exception
+//                throw new JsonPatchApplicationException(
+//                        "Missing field \"" + token.getField() + "\"", Operation.REPLACE, path.getParent());
             ((ObjectNode) parentNode).replace(token.getField(), value);
         } else if (parentNode.isArray()) {
             if (token.getIndex() >= parentNode.size())

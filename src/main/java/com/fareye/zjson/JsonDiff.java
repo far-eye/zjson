@@ -497,16 +497,16 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/")) && target.has(key) && !source.get(key).equals(target.get(key)))
-                diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
-            else if((currPath.toString().contains("TEMPLATE_MASTER/masterMap/")) && target.has(key) )
+            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/"))
+                    && target.has(key) )
             {
-                // add only if key has same value and pubcode differs
-                 if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null&& !source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
-                     diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
-                 }else{
-                     generateDiffs(currPath, source.get(key), target.get(key));
-                 }
+                // make operation as add only if key has same value and pubcode differs
+                if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null&& !source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
+                    diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
+                }
+                else{
+                    diffs.add(Diff.generateDiff(Operation.REPLACE, currPath, source.get(key), target.get(key)));
+                }
             }
             else
                 generateDiffs(currPath, source.get(key), target.get(key));
