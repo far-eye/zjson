@@ -1,10 +1,14 @@
 package com.fareye.zjson;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,6 +110,57 @@ class JsonPointer {
 
         result.add(RefToken.parse(reftoken.toString()));
         return new JsonPointer(result);
+    }
+
+    /**
+     * Generate a valid key of maxIdMap from JSON Pointer.
+     *
+     * @param path The string representation to be parsed.
+     * @return return a valid key of maxIdMap diffs
+     * @throws IllegalArgumentException The specified JSON Pointer is invalid.
+     */
+    public static String parseMaxIdPath(String path) throws IllegalArgumentException {
+        StringBuilder reftoken = null;
+        List<String> result = new ArrayList<String>();
+
+        for (int i = 0; i < path.length(); ++i) {
+            char c = path.charAt(i);
+
+            // Require leading slash
+            if (i == 0) {
+                if (c != '/') throw new IllegalArgumentException("Missing leading slash");
+                reftoken = new StringBuilder();
+                continue;
+            }
+
+            switch (c) {
+                // Escape sequences
+                case '~':
+                    switch (path.charAt(++i)) {
+                        case '0': reftoken.append('~'); break;
+                        case '1': reftoken.append('/'); break;
+                        default:
+                            throw new IllegalArgumentException("Invalid escape sequence ~" + path.charAt(i) + " at index " + i);
+                    }
+                    break;
+
+                // New reftoken
+                case '/':
+                    result.add(reftoken.toString());
+                    reftoken.setLength(0);
+                    break;
+
+                default:
+                    reftoken.append(c);
+                    break;
+            }
+        }
+
+        if (reftoken == null)
+            return null;
+
+        result.add(reftoken.toString());
+        return result.get(1);
     }
 
     /**
@@ -225,6 +280,9 @@ class JsonPointer {
         for (int idx = 0; idx < tokens.length; ++idx) {
             final RefToken token = tokens[idx];
 
+            if(current==null)
+                return null;
+
             if (current.isArray()) {
                 if (!token.isArrayIndex())
                     error(idx, "Can't reference field \"" + token.getField() + "\" on array", document);
@@ -233,8 +291,26 @@ class JsonPointer {
                 current = current.get(token.getIndex());
             }
             else if (current.isObject()) {
-                if (!current.has(token.getField()))
-                    error(idx,"Missing field \"" + token.getField() + "\"", document);
+
+                // create path for operation add , UserType,templateMaster,appJobStatus
+                if (!current.has(token.getField()) && tokens.length==3){
+                    ObjectMapper mapper=new ObjectMapper();
+                    ObjectNode baseObjectNode = (ObjectNode) current;
+                    baseObjectNode.set(token.getField(), mapper.createObjectNode());
+                    current=baseObjectNode;
+                }
+                // handle maxIdMap
+                else if(!current.has(token.getField()) && tokens.length==1 && token.getField().equals("maxIdMap")){
+                    ObjectMapper mapper=new ObjectMapper();
+                    ObjectNode baseObjectNode = (ObjectNode) current;
+                    baseObjectNode.set(token.getField(), mapper.createObjectNode());
+                    current=baseObjectNode;
+                }
+
+                // won't throw error, just skip that patch
+//                if (!current.has(token.getField()))
+//                    error(idx,"Missing field \"" + token.getField() + "\"", document);
+
                 current = current.get(token.getField());
             }
             else

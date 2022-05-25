@@ -36,6 +36,8 @@ import java.util.Map;
 public final class JsonDiff {
 
     private final List<Diff> diffs = new ArrayList<Diff>();
+
+    private final List<Diff> diffsMaxId = new ArrayList<Diff>();
     private final EnumSet<DiffFlags> flags;
 
     private JsonDiff(EnumSet<DiffFlags> flags) {
@@ -71,6 +73,18 @@ public final class JsonDiff {
                 // Split replace into remove and add instructions
                 diff.introduceExplicitRemoveAndAddOperation();
         }
+
+        //generate valid maxId patches and add to original diffs list
+        StringBuilder targetInfo = new StringBuilder();
+        diff.diffs.forEach(targetInfo::append);
+
+        for(Diff tempMaxDiff : diff.diffsMaxId){
+            String maxIdKey =  JsonPointer.parseMaxIdPath(tempMaxDiff.getPath().toString());
+
+            if(maxIdKey!=null && targetInfo.toString().contains(maxIdKey))
+                diff.diffs.add(tempMaxDiff);
+        }
+
         return diff.getJsonNodes();
     }
 
@@ -308,6 +322,7 @@ public final class JsonDiff {
     private ArrayNode getJsonNodes() {
         JsonNodeFactory FACTORY = JsonNodeFactory.instance;
         final ArrayNode patch = FACTORY.arrayNode();
+
         for (Diff diff : diffs) {
             ObjectNode jsonNode = getJsonNode(FACTORY, diff, flags);
             patch.add(jsonNode);
@@ -351,7 +366,8 @@ public final class JsonDiff {
     }
 
     private void generateDiffs(JsonPointer path, JsonNode source, JsonNode target) {
-        if (!source.equals(target)) {
+
+         if (!source.equals(target)) {
             final NodeType sourceType = NodeType.getNodeType(source);
             final NodeType targetType = NodeType.getNodeType(target);
 
@@ -365,9 +381,27 @@ public final class JsonDiff {
                 //can be replaced
                 if (flags.contains(DiffFlags.EMIT_TEST_OPERATIONS))
                     diffs.add(new Diff(Operation.TEST, path, source));
-                diffs.add(Diff.generateDiff(Operation.REPLACE, path, source, target));
+                if(path.toString().startsWith("/maxIdMap/")){
+                    diffsMaxId.add(Diff.generateDiff(Operation.ADD, path, source, target));
+                }else {
+                    diffs.add(Diff.generateDiff(Operation.REPLACE, path, source, target));
+                }
+
             }
         }
+        // generate maxid diff as add
+        else if(path.toString().startsWith("/maxIdMap") && source.equals(target)) {
+             final NodeType sourceType = NodeType.getNodeType(source);
+             final NodeType targetType = NodeType.getNodeType(target);
+
+             if (sourceType == NodeType.OBJECT && targetType == NodeType.OBJECT) {
+                 //both are json
+                 compareObjects(path, source, target);
+             } else {
+                 diffsMaxId.add(Diff.generateDiff(Operation.ADD, path, source, target));
+             }
+         }
+
     }
 
     private void compareArray(JsonPointer path, JsonNode source, JsonNode target) {
@@ -463,8 +497,17 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/")) && target.has(key) && !source.get(key).equals(target.get(key)))
-                diffs.add(Diff.generateDiff(Operation.REPLACE, currPath, source.get(key), target.get(key)));
+            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/"))
+                    && target.has(key) )
+            {
+                // make operation as add only if key has same value and pubcode differs
+                if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null&& !source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
+                    diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
+                }
+                else{
+                    diffs.add(Diff.generateDiff(Operation.REPLACE, currPath, source.get(key), target.get(key)));
+                }
+            }
             else
                 generateDiffs(currPath, source.get(key), target.get(key));
         }
@@ -474,7 +517,14 @@ public final class JsonDiff {
             if (!source.has(key)) {
                 //add case
                 JsonPointer currPath = path.append(key);
-                diffs.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key)));
+                //if maxIdKey is not present in source add the diff as add operation with target values
+                if(currPath.toString().startsWith("/maxIdMap/")){
+                    diffsMaxId.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key), target.get(key)));
+                }
+                else {
+                    diffs.add(Diff.generateDiff(Operation.ADD, currPath, target.get(key)));
+                }
+
             }
         }
     }
