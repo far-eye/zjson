@@ -501,7 +501,7 @@ public final class JsonDiff {
                     && target.has(key) )
             {
                 // make operation as add only if key has same value and pubcode differs
-                if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null&& !source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
+                if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null && source.get(key).get("master").get("pubSolutionCode")!=null && target.get(key).get("master").get("pubSolutionCode")!=null &&!source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
                     diffs.add(Diff.generateDiff(Operation.ADD, currPath, source.get(key), target.get(key)));
                 }
                 else{
