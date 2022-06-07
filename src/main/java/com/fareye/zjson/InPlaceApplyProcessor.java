@@ -152,6 +152,16 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
         if("maxIdMap".equals(key) && node.has(key) && node.get(key).isObject() && value.isObject()){
             mergeInBaseForMaxIdMap(node.get(key), value);
         }
+        else if (path.toString().contains("/maxIdMap/")){
+            ObjectNode baseObjectNode = (ObjectNode) node;
+            JsonNode tempValue = value;
+
+            if(baseObjectNode.get(key)!=null && baseObjectNode.get(key).longValue() > value.longValue()){
+                tempValue = baseObjectNode.get(key);
+            }
+
+            baseObjectNode.set(key,tempValue );
+        }
         else if (node.has(key) && node.get(key).isObject() && value.isObject()) {
             mergeInBase(node.get(key), value);
         }
@@ -170,9 +180,24 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
                 mergeInBase(base.get(fieldName), value.get(fieldName));
             } else {
                 ObjectNode baseObjectNode = (ObjectNode) base;
-                baseObjectNode.set(fieldName, value.get(fieldName));
+                if(fieldName.equals("pageJsonSeq") && !baseObjectNode.get(fieldName).isEmpty()) {
+                    JsonNode tempValue = getPageSeqValue((ArrayNode) baseObjectNode.get(fieldName), (ArrayNode) value.get(fieldName));
+                    baseObjectNode.set(fieldName, tempValue);
+                }
+                else
+                    baseObjectNode.set(fieldName, value.get(fieldName));
             }
         }
+    }
+
+    private JsonNode getPageSeqValue(ArrayNode base, ArrayNode value) {
+        if(value.isEmpty())
+            return base;
+        for(JsonNode arrayNode : value){
+            if(!base.toString().contains(arrayNode.toString()))
+                base.add(arrayNode);
+        }
+        return base;
     }
 
     public void mergeInBaseForMaxIdMap (JsonNode base, JsonNode value) {
