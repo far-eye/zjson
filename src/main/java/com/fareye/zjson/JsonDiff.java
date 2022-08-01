@@ -497,7 +497,7 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/"))
+            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/") || currPath.toString().contains("INVOICE_MASTER/masterMap/"))
                     && target.has(key) )
             {
                 // make operation as add only if key has same value and pubcode differs
