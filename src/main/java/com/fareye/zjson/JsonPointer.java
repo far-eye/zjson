@@ -45,6 +45,9 @@ import java.util.regex.Pattern;
 class JsonPointer {
     private final RefToken[] tokens;
 
+    public static final List<String> JSON_NODE_TO_PROCESSED = Collections.unmodifiableList(Arrays.asList("com.fareye.fcr.module.settingsNewUI.constants.ReactSettingsTypes##PAGE_GROUP_MASTER"));
+
+
     /** A JSON pointer representing the root node of a JSON document */
     public final static JsonPointer ROOT = new JsonPointer(new RefToken[] {});
 
@@ -294,17 +297,14 @@ class JsonPointer {
 
                 // create path for operation add , UserType,templateMaster,appJobStatus
                 if (!current.has(token.getField()) && tokens.length==3){
-                    ObjectMapper mapper=new ObjectMapper();
-                    ObjectNode baseObjectNode = (ObjectNode) current;
-                    baseObjectNode.set(token.getField(), mapper.createObjectNode());
-                    current=baseObjectNode;
+                    current = getCurrent(current, token);
                 }
                 // handle maxIdMap
                 else if(!current.has(token.getField()) && tokens.length==1 && token.getField().equals("maxIdMap")){
-                    ObjectMapper mapper=new ObjectMapper();
-                    ObjectNode baseObjectNode = (ObjectNode) current;
-                    baseObjectNode.set(token.getField(), mapper.createObjectNode());
-                    current=baseObjectNode;
+                    current = getCurrent(current, token);
+                }
+                else if(!current.has(token.getField()) && tokens.length==7 && Arrays.stream(this.tokens).anyMatch(e->JSON_NODE_TO_PROCESSED.contains(e.getField()))){
+                    current = getCurrent(current, token);
                 }
 
                 // won't throw error, just skip that patch
@@ -317,6 +317,14 @@ class JsonPointer {
                 error(idx, "Can't reference past scalar value", document);
         }
 
+        return current;
+    }
+
+    private JsonNode getCurrent(JsonNode current, RefToken token) {
+        ObjectMapper mapper=new ObjectMapper();
+        ObjectNode baseObjectNode = (ObjectNode) current;
+        baseObjectNode.set(token.getField(), mapper.createObjectNode());
+        current =baseObjectNode;
         return current;
     }
 

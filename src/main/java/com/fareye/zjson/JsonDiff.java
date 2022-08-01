@@ -22,12 +22,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.collections4.ListUtils;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: gopi.vishwakarma
@@ -39,6 +34,8 @@ public final class JsonDiff {
 
     private final List<Diff> diffsMaxId = new ArrayList<Diff>();
     private final EnumSet<DiffFlags> flags;
+
+    public static final List<String> DIFF_AS_ADD = Collections.unmodifiableList(Arrays.asList("USER_TYPE/masterMap/","JOB_STATUS_TAB/masterMap/","TEMPLATE_MASTER/masterMap/","REACT_SETTINGS_MASTER/masterMap/","INVOICE_MASTER/masterMap/"));
 
     private JsonDiff(EnumSet<DiffFlags> flags) {
         this.flags = flags.clone();
@@ -497,8 +494,8 @@ public final class JsonDiff {
                 continue;
             }
             JsonPointer currPath = path.append(key);
-            if((currPath.toString().contains("USER_TYPE/masterMap/") || currPath.toString().contains("JOB_STATUS_TAB/masterMap/") || currPath.toString().contains("TEMPLATE_MASTER/masterMap/") || currPath.toString().contains("INVOICE_MASTER/masterMap/"))
-                    && target.has(key) )
+            if(DIFF_AS_ADD.stream().anyMatch(diff->currPath.toString().contains(diff))
+                    && target.has(key))
             {
                 // make operation as add only if key has same value and pubcode differs
                 if( !source.get(key).equals(target.get(key)) && source.get(key).get("master")!=null && target.get(key).get("master")!=null && source.get(key).get("master").get("pubSolutionCode")!=null && target.get(key).get("master").get("pubSolutionCode")!=null &&!source.get(key).get("master").get("pubSolutionCode").equals(target.get(key).get("master").get("pubSolutionCode"))){
