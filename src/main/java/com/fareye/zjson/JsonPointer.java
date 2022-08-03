@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
 class JsonPointer {
     private final RefToken[] tokens;
 
-    public static final List<String> JSON_NODE_TO_PROCESSED = Collections.unmodifiableList(Arrays.asList("com.fareye.fcr.module.settingsNewUI.constants.ReactSettingsTypes##PAGE_GROUP_MASTER"));
+    public static final List<String> JSON_NODE_TO_PROCESSED = Collections.unmodifiableList(Arrays.asList("com.fareye.fcr.module.settingsNewUI.constants.ReactSettingsTypes##REACT_SETTINGS_MASTER","com.fareye.fcr.module.settingsNewUI.constants.ReactSettingsTypes##PAGE_GROUP_MASTER"));
 
 
     /** A JSON pointer representing the root node of a JSON document */
@@ -303,7 +303,7 @@ class JsonPointer {
                 else if(!current.has(token.getField()) && tokens.length==1 && token.getField().equals("maxIdMap")){
                     current = getCurrent(current, token);
                 }
-                else if(!current.has(token.getField()) && tokens.length==7 && Arrays.stream(this.tokens).anyMatch(e->JSON_NODE_TO_PROCESSED.contains(e.getField()))){
+                else if(!current.has(token.getField()) && (tokens.length==7 || tokens.length==4) && Arrays.stream(this.tokens).anyMatch(e->JSON_NODE_TO_PROCESSED.contains(e.getField()))){
                     current = getCurrent(current, token);
                 }
 
