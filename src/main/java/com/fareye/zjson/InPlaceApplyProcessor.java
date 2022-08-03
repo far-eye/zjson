@@ -114,6 +114,8 @@ class InPlaceApplyProcessor implements JsonPatchProcessor {
             throw new JsonPatchApplicationException("Cannot remove document root", Operation.REMOVE, path);
 
         JsonNode parentNode = path.getParent().evaluate(target);
+        if(parentNode==null)
+            return;
         JsonPointer.RefToken token = path.last();
         if (parentNode.isObject())
             ((ObjectNode) parentNode).remove(token.getField());
